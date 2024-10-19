@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Investimento Beefund</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue-router/dist/vue-router.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+ 
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: "Exo 2", sans-serif;
+      font-weight: 600;
+      font-style: italic;
+      background-color: #e6f7ff; /* Cor branco gelo */
+      color: #333;
+      text-align: center;
+      padding: 10px;
+    }
+    
+    #app {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff; /* Fundo branco */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+  }
+    
+    h1 {
+    font-family: "Exo 2", sans-serif;
+    font-weight: 700;
+    font-size: 1.8em;
+    color: #007acc; /* Azul claro */
+    text-align: center;
+    margin-bottom: 20px;
+  }
+    
+    nav {
+      margin-bottom: 20px;
+    }
+    
+    nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #007acc; /* Azul claro */
+    font-size: 1.2em;
+    transition: color 0.3s;
+  }
+    
+    nav a:hover {
+      color: #0099ff;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: flex-end; /* Coloca o menu no canto direito */
+      align-items: center;
+      position: relative;
+    }
+    
+    .menu-icon {
+      display: none; /* Esconde o ícone em telas maiores */
+      flex-direction: column;
+      cursor: pointer;
+      margin-right: 20px; /* Espaço à direita do ícone */
+    }
+    
+    .bar {
+      height: 3px;
+      width: 25px;
+      background-color: #27ae60;
+      margin: 4px 0;
+      transition: 0.3s;
+    }
+    
+    ul {
+      display: flex;
+      list-style: none;
+    }
+    
+    ul.active {
+      display: block; /* Mostra o menu quando ativo */
+    }
+    
+    @media (max-width: 600px) {
+      ul {
+        display: none; /* Esconde o menu por padrão */
+        flex-direction: column;
+        position: absolute;
+        right: 0;
+        background-color: #fff; /* Cor de fundo do menu */
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 10; /* Fica acima de outros elementos */
+      }
+      
+      ul.active {
+        display: flex; /* Mostra o menu quando ativo */
+      }
+      
+      .menu-icon {
+        display: flex; /* Mostra o ícone em telas menores */
+      }
+    }
+    
+    label {
+      font-size: 1.1em;
+      color: #34495e;
+      margin-bottom: 8px;
+      display: block;
+      text-align: center;
+      font-family: "Exo 2", sans-serif;
+    }
+    
+    input, select, button {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0 20px 0;
+    font-size: 1.2em;
+    font-family: "Exo 2", sans-serif;
+    border: 2px solid #ddd;
+    border-radius: 30px;
+    background-color: #f0f8ff; /* Branco gelo */
+    text-align: center;
+    transition: border-color 0.3s ease;
+  }
+    
+    input::placeholder, select::placeholder {
+      color: #7b7b7b; /* Cor do placeholder */
+      font-family: "Exo 2", sans-serif;
+    }
+    
+    button {
+    background-color: #007acc; /* Azul claro */
+    color: white;
+    cursor: pointer;
+    border: none;
+    border-radius: 30px;
+    padding: 15px;
+    font-size: 1.2em;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  }
+    
+    button:hover {
+    background-color: #005fa3; /* Azul mais escuro */
+    transform: translateY(-3px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+  }
+    
+    button:active {
+      background-color: #007acc; /* Cor do botão quando pressionado */
+      transform: translateY(1px); /* Movimento para baixo quando pressionado */
+    }
+    
+    .resultado {
+    background-color: #007acc; /* Azul claro */
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  }
+    
+    .resultado:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .resultado h3 {
+      font-size: 1.8em; /* Tamanho maior para o título */
+      margin-bottom: 10px;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3); /* Sombra no texto */
+      font-family: "Exo 2", sans-serif;
+    }
+    
+    .resultado p {
+      font-size: 1.6em; /* Tamanho maior para o resultado */
+      font-weight: bold;
+      text-align: center; /* Centraliza o texto */
+      font-family: "Exo 2", sans-serif;
+    }
+    
+    .slider-container {
+      margin-top: 15px;
+      text-align: center;
+    }
+    
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.1em;
+      text-align: center;
+    }
+    
+    input[type="range"] {
+      width: 100%;
+      height: 8px;
+      border-radius: 5px;
+      background: #007acc;
+      outline: none;
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    
+    input[type="range"]:hover {
+      opacity: 1;
+    }
+    
+    /* Campo de valor do investimento */
+    .input-container {
+      position: relative;
+      margin-bottom: 20px;
+      text-align: center;
+      font-family: "Exo 2", sans-serif;
+    }
+    
+    .input-container input {
+      padding: 15px 20px;
+      font-size: 1.2em;
+      font-family: "Exo 2", sans-serif;
+      border: 2px solid #ddd;
+      border-radius: 30px;
+      transition: border-color 0.3s ease;
+      background-color: #fafafa;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    .input-container input:focus {
+      border-color: #007acc;
+      outline: none;
+    }
+    
+    /* Seleção de moeda */
+    .select-container {
+      position: relative;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    .select-container select {
+      padding: 15px 20px;
+      font-size: 1.2em;
+      font-family: "Exo 2", sans-serif;
+      border: 2px solid #ddd;
+      border-radius: 30px;
+      background-color: #fafafa;
+      appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%237b7b7b" d="M2 0L0 2h4L2 0zM2 5L0 3h4L2 5z"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 15px top 50%;
+      background-size: 10px 10px;
+      transition: border-color 0.3s ease;
+      text-align: center;
+    }
+    
+    .select-container select:focus {
+      border-color: #007acc;
+      outline: none;
+    }
+    
+    /* Estilo para a tela de carregamento */
+    .loading-screen {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 1);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 1.5em;
+      font-family: "Exo 2", sans-serif;
+      color: #007acc;
+      z-index: 10;
+    }
+    
+    .loading-spinner {
+      border: 4px solid #007acc;
+      border-radius: 50%;
+      border-top: 4px solid #FFFFFFC2;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Espaços para propagandas */
+    .ad-space {
+    margin-top: 20px;
+    text-align: center;
+    background-color: #f0f8ff; /* Branco gelo */
+    border: 1px dashed #ccc;
+    padding: 15px;
+    border-radius: 5px;
+  }
+    
+    /* Estilo para a tabela de rendimentos */
+    .rendimentos-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    
+    .rendimentos-table th, .rendimentos-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    
+    .rendimentos-table th {
+      background-color: #007acc;
+      color: white;
+    }
+    
+    .sobre-container {
+      background-color: #2c3e50; /* Cor de fundo escura */
+      color: white; /* Cor do texto */
+      padding: 20px; /* Espaçamento interno */
+      border-radius: 10px; /* Bordas arredondadas */
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para o container */
+    }
+    
+    .sobre-container h1 {
+      margin-bottom: 15px; /* Margem inferior para o título */
+    }
+    
+    .voltar-button {
+      display: inline-block; /* Para estilização */
+      margin-top: 20px; /* Margem superior */
+      padding: 10px 20px; /* Padding do botão */
+      font-size: 1.2em; /* Tamanho da fonte */
+      color: white; /* Cor do texto do botão */
+      background-color: #007acc; /* Cor de fundo do botão */
+      border: none; /* Remover borda */
+      border-radius: 30px; /* Bordas arredondadas */
+      text-decoration: none; /* Remover underline */
+      transition: background-color 0.3s; /* Transição suave para a cor de fundo */
+    }
+    
+    @media (max-width: 600px) {
+      #app {
+        margin: 20px;
+        padding: 15px;
+      }
+      
+      h1 {
+        font-size: 1.6em;
+      }
+    }
+    
+    .popup {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Fundo semi-transparente */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 20; /* Fica acima de outros elementos */
+}
+
+.popup-content {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+    </style>
+</head>
+<body>
+  <div id="app">
+    <nav>
+      <router-link to="/">Início</router-link>
+      <router-link to="/sobre">Sobre</router-link>
+    </nav>
+    <router-view></router-view>
+  </div>
+
+  <script>
+    // Definindo componentes
+    const TelaInicial = {
+      template: `
+        <div>
+          <div v-if="loading" class="loading-screen">
+            <div class="loading-spinner"></div>
+            <span>Calculando...</span>
+          </div>
+          <button @click="openPopup">Doação</button>
+
+<div class="popup" v-if="popupVisible">
+  <div class="popup-content">
+    <span class="close" @click="closePopup">&times;</span>
+    <img src="/src/assets/A4 Pagamento com Pix Simples_20241019_122639_0000.png" width="275"
+    height="400"alt="Ajude a manter esse app no ar" />
+     <p>Ajude a manter esse app no ar, doe!</p><br>
+     <h4>Copie e cole:</h4><br />
+    <h4>00020126360014BR.GOV.BCB.PIX011
+    4+5548996116394520400005
+    3039865802BR5901N6001C6
+    2100506Onofre630414C3</h4>
+  </div>
+</div>
+
+
+          <h1>Calculadora de Investimento TrustFund</h1>
+
+          <div>
+            <!-- Campo de valor do investimento -->
+            <div class="input-container">
+              <input v-model="valorInvestimento" type="number" placeholder="Digite o valor do investimento" @input="validarValor" required>
+            </div>
+            <span v-if="erroValor" style="color: red;">{{ erroValor }}</span>
+
+            <!-- Seleção de moeda -->
+            <div class="select-container">
+              <select v-model="moeda">
+                <option value="" disabled selected>Selecione a moeda</option>
+                <option value="real">Real (R$)</option>
+                <option value="dolar">Dólar ($)</option>
+              </select>
+            </div>
+
+            <!-- Seleção de investimento -->
+            <label>Escolha o tipo de investimento:</label>
+            <select v-model="investimentoEscolhido">
+              <option value="" disabled selected>Selecione um investimento</option>
+              <option value="anne">Cassino Trust (48% a cada 15 dias)</option>
+              <option value="pepperstone">Forex Trust (20% a cada 7 dias)</option>
+              <option value="tradovate">Apostas Esportivas (105% a cada 30 dias)</option>
+            </select>
+
+            <!-- Seleção de meses -->
+            <label>Meses:</label>
+            <div class="slider-container">
+              <input type="range" v-model="meses" min="1" max="36" class="slider" />
+              <div class="slider-label">
+                <span>1</span>
+                <span>{{ meses }}</span>
+                <span>36</span>
+              </div>
+            </div>
+
+            <button @click="calcularJuros">Calcular Juros</button>
+
+            <!-- Resultado -->
+            <div class="resultado" v-if="resultado">
+              <h3>Resultado Final:</h3>
+              <p>{{ resultado }}</p>
+              
+              <h4>Resultados Mensais:</h4>
+              <table class="rendimentos-table" v-if="resultadosMensais.length">
+                  <thead>
+                      <tr>
+                          <th>Período (dias)</th>
+                          <th>Montante</th>
+                      </tr>
+                  </thead>
+                  <tbody>
+                      <tr v-for="(resultado, index) in resultadosMensais" :key="index">
+                          <td>{{ resultado.periodo }}</td>
+                          <td>{{ resultado.montante }}</td>
+                      </tr>
+                  </tbody>
+              </table>
+          </div>
+
+          <!-- Espaços para propagandas -->
+        </div>
+      `,
+      data() {
+        return {
+            valorInvestimento: '',
+            moeda: '',
+            meses: 1,
+            investimentoEscolhido: '',
+            resultado: null,
+            erroValor: '',
+            loading: false,
+            historico: [],
+            resultadosMensais: [], // Adicionando uma nova propriedade para armazenar resultados mensais
+            menuOpen: false, // Controle do estado do menu
+            popupVisible: false,
+        };
+      },
+      methods: {
+      	getValueAsReal(valor) {
+        	return  new Intl.NumberFormat('pt-BR', {
+    				style: 'currency',
+    				currency: 'BRL',
+					}).format(valor);
+        },
+        getValueAsDolar(valor) {
+        	return  new Intl.NumberFormat('en-US', {
+    				style: 'currency',
+    				currency: 'USD',
+					}).format(valor);
+        },
+        getFormattedValue(moeda, valor) {
+        	return moeda === 'real'
+          	? this.getValueAsReal(valor)
+            : this.getValueAsDolar(valor)
+        },
+        toggleMenu() {
+            this.menuOpen = !this.menuOpen; // Alterna o estado do menu
+        },
+        validarValor() {
+          if (this.valorInvestimento < 0) {
+            this.erroValor = 'O valor não pode ser negativo!';
+            this.valorInvestimento = '';
+          } else {
+            this.erroValor = '';
+          }
+        },
+        openPopup() {
+    this.popupVisible = true;
+  },
+  closePopup() {
+    this.popupVisible = false;
+  },
+        calcularJuros() {
+          if (this.valorInvestimento <= 0) {
+            this.erroValor = 'Por favor, insira um valor positivo!';
+            return;
+        }
+        this.loading = true;
+        this.resultadosMensais = []; // Limpa os resultados mensais a cada cálculo
+
+        setTimeout(() => {
+            let taxa, periodo;
+
+            // Definir as taxas e períodos com base no tipo de investimento escolhido
+            switch (this.investimentoEscolhido) {
+                case 'anne':
+                    taxa = 0.48;
+                    periodo = 15; // 15 dias
+                    break;
+                case 'pepperstone':
+                    taxa = 0.20;
+                    periodo = 7; // 7 dias
+                    break;
+                case 'tradovate':
+                    taxa = 1.05;
+                    periodo = 30; // 30 dias
+                    break;
+                default:
+                    alert("Por favor, escolha um investimento válido.");
+                    this.loading = false;
+                    return;
+            }
+
+            const diasPorMes = 30;
+            const numPeriodos = Math.floor((this.meses * diasPorMes) / periodo);
+            const montanteFinal = this.valorInvestimento * Math.pow(1 + taxa, numPeriodos);
+
+            // Calcular os resultados mensais
+            for (let i = 1; i <= numPeriodos; i++) {
+                const montanteMensal = this.valorInvestimento * Math.pow(1 + taxa, i);
+                this.resultadosMensais.push({
+                    periodo: i * periodo,
+                    montante: this.getFormattedValue(this.moeda, montanteMensal.toFixed(2))
+                });
+            }
+            
+            this.resultado = this.getFormattedValue(this.moeda, montanteFinal.toFixed(2));
+
+            // Salvar resultado no histórico
+            this.historico.push({
+                valorInvestimento: this.valorInvestimento,
+                investimentoEscolhido: this.investimentoEscolhido,
+                meses: this.meses,
+                resultado: this.resultado
+            });
+
+            this.loading = false;
+
+            // Rolando até o resultado final
+            this.$nextTick(() => {
+                const resultadoElement = this.$el.querySelector('.resultado');
+                if (resultadoElement) {
+                    resultadoElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            });
+        }, 2000); // Simulação de tempo de carregamento
+        }
+      },
+      mounted() {
+        this.openPopup();
+      }
+    };
+
+    const Sobre = {
+    template: `
+        <div class="sobre-container">
+            <h1>Sobre</h1>
+            <p>Este aplicativo não tem relação com a plataforma TrustFund. Foi criado por terceiros para ajudar a calcular seus futuros ganhos.</p><br>
+            <p>&copy; IndieLab</p>
+            <router-link to="/" class="voltar-button">Voltar para Início</router-link>
+        </div>
+    `
+};
+
+    const Rendimentos = {
+      template: `
+        <div>
+          <h1>Rendimento Mensal</h1>
+          <table class="rendimentos-table">
+            <thead>
+              <tr>
+                <th>Investimento</th>
+                <th>Valor Investido</th>
+                <th>Resultado</th>
+                <th>Meses</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(rendimento, index) in historico" :key="index">
+                <td>{{ rendimento.investimentoEscolhido }}</td>
+                <td>{{ rendimento.valorInvestimento }}</td>
+                <td>{{ rendimento.resultado }}</td>
+                <td>{{ rendimento.meses }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <button @click="calcularRendimentos">Calcular Rendimentos</button>
+        </div>
+      `,
+      data() {
+        return {
+          historico: [] // Armazenando os resultados
+        };
+      },
+      created() {
+        // Obter o histórico da tela inicial
+        this.historico = TelaInicial.data().historico;
+      },
+      methods: {
+        calcularRendimentos() {
+          // Função vazia, pois a tabela já está mostrando os históricos
+        }
+      }
+    };
+
+    // Definindo rotas
+    const routes = [
+        { path: '/', component: TelaInicial },
+        { path: '/rendimentos', component: Rendimentos },
+        { path: '/sobre', component: Sobre } // Nova rota para o componente Sobre
+    ];
+
+    const router = new VueRouter({
+      routes // Short for `routes: routes`
+    });
+
+    new Vue({
+      el: '#app',
+      router
+    });
+  </script>
+</body>
+</html>
